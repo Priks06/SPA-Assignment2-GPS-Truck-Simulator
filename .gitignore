@@ -1,0 +1,14 @@
+.classpath
+.project
+.settings/
+target/
+/.idea/
+*.iml
+log/
+logs/
+.DS_Store
+${sys:logs.path}
+.idea/
+/.scannerwork/
+/.gradle/
+.lck
