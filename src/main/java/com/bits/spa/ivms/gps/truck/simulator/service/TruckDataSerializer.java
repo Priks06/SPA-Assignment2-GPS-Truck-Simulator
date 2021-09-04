@@ -1,16 +1,9 @@
 package com.bits.spa.ivms.gps.truck.simulator.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
-import java.util.Map;
-
 public class TruckDataSerializer implements Serializer<TruckData> {
-    @Override
-    public void configure(Map<String, ?> configs, boolean isKey) {
-
-    }
 
     @Override
     public byte[] serialize(String s, TruckData truckData) {
@@ -22,11 +15,6 @@ public class TruckDataSerializer implements Serializer<TruckData> {
             e.printStackTrace();
         }
         return retVal;
-    }
-
-    @Override
-    public byte[] serialize(String topic, Headers headers, TruckData data) {
-        return new byte[0];
     }
 
     @Override

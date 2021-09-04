@@ -1,5 +1,6 @@
 package com.bits.spa.ivms.gps.truck.simulator.boot;
 
+import com.bits.spa.ivms.gps.truck.simulator.kafka.consumer.KafkaTruckConsumer;
 import com.bits.spa.ivms.gps.truck.simulator.publisher.MQTTPublisher;
 import com.bits.spa.ivms.gps.truck.simulator.subscriber.MQTTSubscriber;
 import org.slf4j.Logger;
@@ -23,9 +24,12 @@ public class GPSSimulatorSpringBootApplication implements CommandLineRunner {
 
     private final MQTTSubscriber subscriber;
 
-    public GPSSimulatorSpringBootApplication(MQTTPublisher publisher, MQTTSubscriber subscriber) {
+    private final KafkaTruckConsumer kafkaTruckConsumer;
+
+    public GPSSimulatorSpringBootApplication(MQTTPublisher publisher, MQTTSubscriber subscriber, KafkaTruckConsumer kafkaTruckConsumer) {
         this.publisher = publisher;
         this.subscriber = subscriber;
+        this.kafkaTruckConsumer = kafkaTruckConsumer;
     }
 
     public static void main(String[] args) {
@@ -41,6 +45,7 @@ public class GPSSimulatorSpringBootApplication implements CommandLineRunner {
         try {
             publisher.publishMessages(brokerAddr, topic);
             subscriber.listenToMessages(brokerAddr, topic);
+            //kafkaTruckConsumer.startConsumingStreamData();
         } catch (Exception e) {
             logger.error("Something went horribly wrong, ", e);
         }

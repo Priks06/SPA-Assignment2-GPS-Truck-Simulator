@@ -50,6 +50,7 @@ public class MQTTSubscriber {
                 logger.info("Data received: {}", truckData);
 
                 ProducerRecord<String, TruckData> record = new ProducerRecord<>(kafkaTopic, truckData);
+                logger.info("Kafka producer record: {}", record.value());
                 kafkaProducer.send(record, (recordMetadata, e) -> {
                     if (e == null) {
                         // Successfully sent

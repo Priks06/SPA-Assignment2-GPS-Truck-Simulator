@@ -59,10 +59,10 @@ public class GPSTruckSimulation {
     }
 
     private double generateNextLatitudeData(double currLatitude) {
-        return currLatitude + 0.004;
+        return currLatitude + 0.00004;
     }
 
     private double generateNextLongitudeData(double currLongitude) {
-        return currLongitude + 0.0004;
+        return currLongitude + 0.00004;
     }
 }
