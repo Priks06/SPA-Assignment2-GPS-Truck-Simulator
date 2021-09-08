@@ -1,6 +1,7 @@
 package com.bits.spa.ivms.gps.truck.simulator.boot;
 
 import com.bits.spa.ivms.gps.truck.simulator.kafka.consumer.KafkaTruckConsumer;
+import com.bits.spa.ivms.gps.truck.simulator.mongodb.TruckDataRepository;
 import com.bits.spa.ivms.gps.truck.simulator.publisher.MQTTPublisher;
 import com.bits.spa.ivms.gps.truck.simulator.subscriber.MQTTSubscriber;
 import org.slf4j.Logger;
@@ -10,25 +11,27 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.bits.spa.ivms.gps.truck.simulator")
 @PropertySource("classpath:application.properties")
 @EnableAsync
+@EnableMongoRepositories(basePackageClasses = TruckDataRepository.class)
 public class GPSSimulatorSpringBootApplication implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(GPSSimulatorSpringBootApplication.class);
 
-    private final MQTTPublisher publisher;
+    private final MQTTPublisher mqttPublisher;
 
-    private final MQTTSubscriber subscriber;
+    private final MQTTSubscriber mqttSubscriber;
 
     private final KafkaTruckConsumer kafkaTruckConsumer;
 
-    public GPSSimulatorSpringBootApplication(MQTTPublisher publisher, MQTTSubscriber subscriber, KafkaTruckConsumer kafkaTruckConsumer) {
-        this.publisher = publisher;
-        this.subscriber = subscriber;
+    public GPSSimulatorSpringBootApplication(MQTTPublisher mqttPublisher, MQTTSubscriber mqttSubscriber, KafkaTruckConsumer kafkaTruckConsumer) {
+        this.mqttPublisher = mqttPublisher;
+        this.mqttSubscriber = mqttSubscriber;
         this.kafkaTruckConsumer = kafkaTruckConsumer;
     }
 
@@ -43,9 +46,9 @@ public class GPSSimulatorSpringBootApplication implements CommandLineRunner {
         String topic = "spa/assignment2/truck";
 
         try {
-            publisher.publishMessages(brokerAddr, topic);
-            subscriber.listenToMessages(brokerAddr, topic);
-            //kafkaTruckConsumer.startConsumingStreamData();
+            mqttPublisher.publishMessages(brokerAddr, topic);
+            mqttSubscriber.listenToMessages(brokerAddr, topic);
+            kafkaTruckConsumer.startConsumingStreamData();
         } catch (Exception e) {
             logger.error("Something went horribly wrong, ", e);
         }

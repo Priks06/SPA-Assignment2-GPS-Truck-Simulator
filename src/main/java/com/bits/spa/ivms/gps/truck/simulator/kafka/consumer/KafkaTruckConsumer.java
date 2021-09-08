@@ -1,5 +1,7 @@
 package com.bits.spa.ivms.gps.truck.simulator.kafka.consumer;
 
+import com.bits.spa.ivms.gps.truck.simulator.mongodb.TruckDataEntity;
+import com.bits.spa.ivms.gps.truck.simulator.mongodb.TruckDataRepository;
 import com.bits.spa.ivms.gps.truck.simulator.service.TruckData;
 import com.bits.spa.ivms.gps.truck.simulator.service.TruckDataDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -9,6 +11,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -29,6 +32,9 @@ public class KafkaTruckConsumer {
     @Value("${kafka.topic}")
     private String kafkaTopic = "first_topic";
 
+    @Autowired
+    private TruckDataRepository truckDataRepository;
+
     private KafkaConsumer<Integer, TruckData> kafkaConsumer;
 
     @Async("streamEvenHandlerTaskExecutor")
@@ -44,11 +50,33 @@ public class KafkaTruckConsumer {
 
         kafkaConsumer.subscribe(Collections.singletonList(kafkaTopic));
 
+        int maxEmptyRecordsCount = 2000;
+        int noRecordsReadCount = 0;
+
         while (true) {
-            ConsumerRecords<Integer, TruckData> records = kafkaConsumer.poll(Duration.ofMillis(100));
+            ConsumerRecords<Integer, TruckData> records = kafkaConsumer.poll(Duration.ofMillis(500));
+            if (records.count() == 0) {
+                noRecordsReadCount++;
+                if (noRecordsReadCount >  maxEmptyRecordsCount) {
+                    logger.info("Breaking consumer!!");
+                    break;
+                }
+                else
+                    continue;
+            }
             for (ConsumerRecord<Integer, TruckData> record : records) {
-                if (record.value() != null)
-                logger.info("Key: {} Value: {}", record.key(), record.value());
+                TruckData truckData = record.value();
+                if (truckData != null) {
+                    logger.info("Key: {} Value: {}", record.key(), truckData);
+                    // Insert the raw data into MongoDB
+                    TruckDataEntity truckDataEntity = new TruckDataEntity();
+                    truckDataEntity.setDriverId(truckData.getDriverId());
+                    truckDataEntity.setRouteName(truckData.getRouteName());
+                    truckDataEntity.setTimestamp(truckData.getTimestamp());
+                    truckDataEntity.setLatitude(truckData.getLatitude());
+                    truckDataEntity.setLongitude(truckData.getLongitude());
+                    truckDataRepository.save(truckDataEntity);
+                }
             }
         }
     }
