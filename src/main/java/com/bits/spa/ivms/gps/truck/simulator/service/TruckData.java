@@ -17,10 +17,12 @@ public class TruckData implements Serializable {
 
     private String routeName;
 
-    private String timestamp;
+    private String currTimestamp;
+    private String currLatitude;
+    private String currLongitude;
 
-    private String latitude;
-
-    private String longitude;
+    private String prevTimestamp;
+    private String prevLatitude;
+    private String prevLongitude;
 
 }

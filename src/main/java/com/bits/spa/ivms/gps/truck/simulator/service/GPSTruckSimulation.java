@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class GPSTruckSimulation {
@@ -17,13 +18,16 @@ public class GPSTruckSimulation {
 
     public List<TruckData> simulateTruckData(int driverId, String routeName) {
         List<TruckData> truckDataList = new ArrayList<>();
+        TruckData prevTruckData;
 
         double currLatitude = getInitialLatitude();
         double currLongitude = getInitialLongitude();
         LocalDateTime dateTime = LocalDateTime.now();
         String currTimestamp = dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
-        truckDataList.add(formMockTruckData(driverId, routeName, currTimestamp, currLatitude, currLongitude));
+        TruckData initialTruckData = formMockTruckData(driverId, routeName, currTimestamp, currLatitude, currLongitude, null);
+        truckDataList.add(initialTruckData);
+        prevTruckData = initialTruckData;
 
 
         DecimalFormat df = new DecimalFormat("#.#######");
@@ -34,14 +38,26 @@ public class GPSTruckSimulation {
 //            logger.info("latitude:longitude --> " + df.format(currLatitude) + "," + df.format(currLongitude));
             dateTime = dateTime.plusSeconds(1);
             currTimestamp = dateTime.format((DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            truckDataList.add(formMockTruckData(driverId, routeName, currTimestamp, currLatitude, currLongitude));
+            TruckData truckData = formMockTruckData(driverId, routeName, currTimestamp, currLatitude, currLongitude, prevTruckData);
+            truckDataList.add(truckData);
+            prevTruckData = truckData;
 
         }
         return truckDataList;
     }
 
-    private TruckData formMockTruckData(int driverId, String routeName, String timestamp, double latitude, double longitude) {
-        TruckData truckData = new TruckData(driverId, routeName, timestamp, String.valueOf(latitude), String.valueOf(longitude));
+    private TruckData formMockTruckData(int driverId, String routeName, String timestamp, double latitude, double longitude, TruckData prevTruckData) {
+        TruckData truckData = new TruckData();
+        truckData.setDriverId(driverId);
+        truckData.setRouteName(routeName);
+        truckData.setCurrTimestamp(timestamp);
+        truckData.setCurrLatitude(String.valueOf(latitude));
+        truckData.setCurrLongitude(String.valueOf(longitude));
+        if (!Objects.isNull(prevTruckData)) {
+            truckData.setPrevTimestamp(prevTruckData.getCurrTimestamp());
+            truckData.setPrevLatitude(prevTruckData.getCurrLatitude());
+            truckData.setPrevLongitude(prevTruckData.getCurrLongitude());
+        }
 //        logger.info("Truck data: {}", truckData);
         return truckData;
     }
@@ -64,5 +80,11 @@ public class GPSTruckSimulation {
 
     private double generateNextLongitudeData(double currLongitude) {
         return currLongitude + 0.00004;
+    }
+
+    public static void main(String[] args) {
+        GPSTruckSimulation gpsTruckSimulator = new GPSTruckSimulation();
+        List<TruckData> truckDataList = gpsTruckSimulator.simulateTruckData(11, "Trial Route");
+        truckDataList.forEach(truckData -> logger.info("Mock data: {}", truckData));
     }
 }
