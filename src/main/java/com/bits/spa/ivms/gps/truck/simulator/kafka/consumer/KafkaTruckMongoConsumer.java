@@ -26,10 +26,10 @@ public class KafkaTruckMongoConsumer {
     private static final Logger logger = LoggerFactory.getLogger(KafkaTruckMongoConsumer.class);
 
     @Value("${kafka.bootstrap.servers}")
-    private String bootstrapServer = "10.128.175.151:9092";
+    private String bootstrapServer;
 
     @Value("${kafka.topic}")
-    private String kafkaTopic = "first_topic";
+    private String kafkaTopic;
 
     private final TruckDataRepository truckDataRepository;
 
