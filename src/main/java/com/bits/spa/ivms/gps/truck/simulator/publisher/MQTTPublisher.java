@@ -55,6 +55,7 @@ public class MQTTPublisher {
     }
 
     private MqttMessage getTruckDataPayload(String routeName, int driverId) throws IOException {
+        // TODO: Spawn async threads which will generate mock data for different drivers in parallel.
         List<TruckData> mockTruckData = gpsTruckSimulation.simulateTruckData(driverId, routeName);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);

@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-public class TruckData implements Serializable {
+public class TruckSpeed implements Serializable {
 
     private static final long serialVersionUID = 3134117589354720891L;
 
@@ -17,12 +17,8 @@ public class TruckData implements Serializable {
 
     private String routeName;
 
-    private String currTimestamp;
-    private String currLatitude;
-    private String currLongitude;
+    private String timestamp;
 
-    private String prevTimestamp;
-    private String prevLatitude;
-    private String prevLongitude;
+    private double speed;
 
 }

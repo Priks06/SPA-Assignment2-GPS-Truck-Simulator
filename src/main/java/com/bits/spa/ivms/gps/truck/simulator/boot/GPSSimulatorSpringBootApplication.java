@@ -1,6 +1,8 @@
 package com.bits.spa.ivms.gps.truck.simulator.boot;
 
-import com.bits.spa.ivms.gps.truck.simulator.kafka.consumer.KafkaTruckConsumer;
+import com.bits.spa.ivms.gps.truck.simulator.kafka.consumer.KafkaTruckMongoConsumer;
+import com.bits.spa.ivms.gps.truck.simulator.kafka.consumer.KafkaTruckOverSpeedingConsumer;
+import com.bits.spa.ivms.gps.truck.simulator.kafka.consumer.KafkaTruckSpeedingConsumer;
 import com.bits.spa.ivms.gps.truck.simulator.mongodb.TruckDataRepository;
 import com.bits.spa.ivms.gps.truck.simulator.publisher.MQTTPublisher;
 import com.bits.spa.ivms.gps.truck.simulator.subscriber.MQTTSubscriber;
@@ -27,12 +29,18 @@ public class GPSSimulatorSpringBootApplication implements CommandLineRunner {
 
     private final MQTTSubscriber mqttSubscriber;
 
-    private final KafkaTruckConsumer kafkaTruckConsumer;
+    private final KafkaTruckMongoConsumer kafkaTruckMongoConsumer;
 
-    public GPSSimulatorSpringBootApplication(MQTTPublisher mqttPublisher, MQTTSubscriber mqttSubscriber, KafkaTruckConsumer kafkaTruckConsumer) {
+    private final KafkaTruckSpeedingConsumer kafkaTruckSpeedingConsumer;
+
+    private final KafkaTruckOverSpeedingConsumer kafkaTruckOverSpeedingConsumer;
+
+    public GPSSimulatorSpringBootApplication(MQTTPublisher mqttPublisher, MQTTSubscriber mqttSubscriber, KafkaTruckMongoConsumer kafkaTruckMongoConsumer, KafkaTruckSpeedingConsumer kafkaTruckSpeedingConsumer, KafkaTruckOverSpeedingConsumer kafkaTruckOverSpeedingConsumer) {
         this.mqttPublisher = mqttPublisher;
         this.mqttSubscriber = mqttSubscriber;
-        this.kafkaTruckConsumer = kafkaTruckConsumer;
+        this.kafkaTruckMongoConsumer = kafkaTruckMongoConsumer;
+        this.kafkaTruckSpeedingConsumer = kafkaTruckSpeedingConsumer;
+        this.kafkaTruckOverSpeedingConsumer = kafkaTruckOverSpeedingConsumer;
     }
 
     public static void main(String[] args) {
@@ -46,9 +54,11 @@ public class GPSSimulatorSpringBootApplication implements CommandLineRunner {
         String topic = "spa/assignment2/truck";
 
         try {
+            kafkaTruckOverSpeedingConsumer.filterAndPublishOverSpeedingTrucks();
             mqttPublisher.publishMessages(brokerAddr, topic);
             mqttSubscriber.listenToMessages(brokerAddr, topic);
-            kafkaTruckConsumer.startConsumingStreamData();
+            kafkaTruckMongoConsumer.startConsumingStreamData();
+            kafkaTruckSpeedingConsumer.startConsumingStreamData();
         } catch (Exception e) {
             logger.error("Something went horribly wrong, ", e);
         }

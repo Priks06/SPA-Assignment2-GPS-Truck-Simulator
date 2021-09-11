@@ -11,7 +11,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -22,20 +21,23 @@ import java.util.Collections;
 import java.util.Properties;
 
 @Component
-public class KafkaTruckConsumer {
+public class KafkaTruckMongoConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(KafkaTruckConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(KafkaTruckMongoConsumer.class);
 
     @Value("${kafka.bootstrap.servers}")
-    private String bootstrapServer = "10.128.175.151:9092";
+    private String bootstrapServer;
 
     @Value("${kafka.topic}")
-    private String kafkaTopic = "first_topic";
+    private String kafkaTopic;
 
-    @Autowired
-    private TruckDataRepository truckDataRepository;
+    private final TruckDataRepository truckDataRepository;
 
     private KafkaConsumer<Integer, TruckData> kafkaConsumer;
+
+    public KafkaTruckMongoConsumer(TruckDataRepository truckDataRepository) {
+        this.truckDataRepository = truckDataRepository;
+    }
 
     @Async("streamEvenHandlerTaskExecutor")
     public void startConsumingStreamData() {
@@ -72,18 +74,13 @@ public class KafkaTruckConsumer {
                     TruckDataEntity truckDataEntity = new TruckDataEntity();
                     truckDataEntity.setDriverId(truckData.getDriverId());
                     truckDataEntity.setRouteName(truckData.getRouteName());
-                    truckDataEntity.setTimestamp(truckData.getTimestamp());
-                    truckDataEntity.setLatitude(truckData.getLatitude());
-                    truckDataEntity.setLongitude(truckData.getLongitude());
+                    truckDataEntity.setTimestamp(truckData.getCurrTimestamp());
+                    truckDataEntity.setLatitude(truckData.getCurrLatitude());
+                    truckDataEntity.setLongitude(truckData.getCurrLongitude());
                     truckDataRepository.save(truckDataEntity);
                 }
             }
         }
-    }
-
-    public static void main(String[] args) {
-        KafkaTruckConsumer kafkaTruckConsumer = new KafkaTruckConsumer();
-        kafkaTruckConsumer.startConsumingStreamData();
     }
 
     @PreDestroy
