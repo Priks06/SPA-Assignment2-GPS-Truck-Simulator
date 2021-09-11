@@ -23,8 +23,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Properties;
@@ -92,9 +91,9 @@ public class KafkaTruckSpeedingConsumer {
                         double currLatitude = Double.parseDouble(truckData.getCurrLatitude());
                         double currLongitude = Double.parseDouble(truckData.getCurrLongitude());
                         double distanceMeters = DistanceCalculatorService.haversine(prevLatitude, prevLongitude, currLatitude, currLongitude) * 1000;
-                        LocalDateTime prevTimestamp = LocalDateTime.from(DateTimeFormatter.ISO_LOCAL_DATE_TIME.parse(truckData.getPrevTimestamp()));
-                        LocalDateTime currTimestamp = LocalDateTime.from(DateTimeFormatter.ISO_LOCAL_DATE_TIME.parse(truckData.getCurrTimestamp()));
-                        long timeDiff = currTimestamp.toInstant(ZoneOffset.UTC).toEpochMilli() - prevTimestamp.toInstant(ZoneOffset.UTC).toEpochMilli();
+                        ZonedDateTime prevTimestamp = ZonedDateTime.from(DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(truckData.getPrevTimestamp()));
+                        ZonedDateTime currTimestamp = ZonedDateTime.from(DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(truckData.getCurrTimestamp()));
+                        long timeDiff = currTimestamp.toInstant().toEpochMilli() - prevTimestamp.toInstant().toEpochMilli();
                         if (timeDiff > 0) {
                             double speedInMPS = distanceMeters / (timeDiff / 1000.0);
                             double speedInKMPH = speedInMPS * 3.6;

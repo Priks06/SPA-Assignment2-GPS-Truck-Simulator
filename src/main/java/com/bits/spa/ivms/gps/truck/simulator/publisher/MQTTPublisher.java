@@ -34,13 +34,13 @@ public class MQTTPublisher {
             int randomId = (int) (Math.random() * 100);
             String routeName = "Route " + randomId;
             int driverId = (int) (Math.random() * 100);
-            MqttMessage mockTruckData = getTruckDataPayload(routeName, driverId);
+            MqttMessage mockTruckData = getTruckDataPayload(routeName, driverId, 1);
             publishSingleTruckMessage(mockTruckData, topic);
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 1; i++) {
                 routeName = "Route " + (++randomId);
                 ++driverId;
-                mockTruckData = getTruckDataPayload(routeName, driverId);
+                mockTruckData = getTruckDataPayload(routeName, driverId, i+2);
                 publishSingleTruckMessage(mockTruckData, topic);
                 TimeUnit.SECONDS.sleep(5);
             }
@@ -54,9 +54,9 @@ public class MQTTPublisher {
         publisher.publish(topic, message);
     }
 
-    private MqttMessage getTruckDataPayload(String routeName, int driverId) throws IOException {
+    private MqttMessage getTruckDataPayload(String routeName, int driverId, int geoFileIndex) throws IOException {
         // TODO: Spawn async threads which will generate mock data for different drivers in parallel.
-        List<TruckData> mockTruckData = gpsTruckSimulation.simulateTruckData(driverId, routeName);
+        List<TruckData> mockTruckData = gpsTruckSimulation.simulateTruckData(driverId, routeName, geoFileIndex);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(mockTruckData);
