@@ -22,7 +22,8 @@ public class GeoJSONHelper {
     public static List<TruckData> readGeoJsonFile(int geoFileIndex) {
         List<TruckData> truckDataList = new ArrayList<>();
         try {
-            File file = ResourceUtils.getFile("classpath:geo-files/map-1.geojson");
+            String resourceLocation = "classpath:geo-files/map-" + geoFileIndex + ".geojson";
+            File file = ResourceUtils.getFile(resourceLocation);
             InputStream inputStream = new FileInputStream(file);
             byte[] byteData = FileCopyUtils.copyToByteArray(inputStream);
             String data = new String(byteData, StandardCharsets.UTF_8);
