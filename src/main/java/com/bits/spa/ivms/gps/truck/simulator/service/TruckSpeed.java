@@ -19,6 +19,6 @@ public class TruckSpeed implements Serializable {
 
     private String timestamp;
 
-    private String speed;
+    private double speed;
 
 }

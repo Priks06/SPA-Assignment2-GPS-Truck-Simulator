@@ -5,7 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,11 @@ public class GPSTruckSimulation {
 
         double currLatitude = getInitialLatitude();
         double currLongitude = getInitialLongitude();
-        LocalDateTime dateTime = LocalDateTime.now();
-        String currTimestamp = dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+//        LocalDateTime dateTime = LocalDateTime.now();
+//        String currTimestamp = dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneId.of("UTC"));
+        String currTimestamp = dateTime.format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
 
         TruckData initialTruckData = formMockTruckData(driverId, routeName, currTimestamp, currLatitude, currLongitude, null);
         truckDataList.add(initialTruckData);
@@ -36,8 +40,8 @@ public class GPSTruckSimulation {
             currLatitude = generateNextLatitudeData(currLatitude);
             currLongitude = generateNextLongitudeData(currLongitude);
 //            logger.info("latitude:longitude --> " + df.format(currLatitude) + "," + df.format(currLongitude));
-            dateTime = dateTime.plusSeconds(1);
-            currTimestamp = dateTime.format((DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            dateTime = dateTime.plusSeconds(20);
+            currTimestamp = dateTime.format((DateTimeFormatter.ISO_ZONED_DATE_TIME));
             TruckData truckData = formMockTruckData(driverId, routeName, currTimestamp, currLatitude, currLongitude, prevTruckData);
             truckDataList.add(truckData);
             prevTruckData = truckData;
@@ -75,7 +79,10 @@ public class GPSTruckSimulation {
     }
 
     private double generateNextLatitudeData(double currLatitude) {
-        return currLatitude + 0.00004;
+        double minLon = 0.00010;
+        double maxLon = 0.00015;
+        double locationDiff = minLon + (Math.random() * ((maxLon - minLon) + 1));
+        return currLatitude + locationDiff;
     }
 
     private double generateNextLongitudeData(double currLongitude) {
