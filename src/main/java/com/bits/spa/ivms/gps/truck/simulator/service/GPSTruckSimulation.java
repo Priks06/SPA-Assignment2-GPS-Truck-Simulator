@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class GPSTruckSimulation {
     public List<TruckData> simulateTruckData(int driverId, String routeName, int geoFileIndex) {
         List<TruckData> truckDataList;
         TruckData prevTruckData = null;
-        ZonedDateTime dateTime = ZonedDateTime.now(ZoneId.of("UTC"));
+        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("UTC"));
         String currTimestamp;
 
 
@@ -29,7 +29,7 @@ public class GPSTruckSimulation {
             truckData.setDriverId(driverId);
             truckData.setRouteName(routeName);
             dateTime = dateTime.plusSeconds(5);
-            currTimestamp = dateTime.format((DateTimeFormatter.ISO_ZONED_DATE_TIME));
+            currTimestamp = dateTime.format((DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             truckData.setCurrTimestamp(currTimestamp);
             if (Objects.nonNull(prevTruckData)) {
                 truckData.setPrevTimestamp(prevTruckData.getCurrTimestamp());
