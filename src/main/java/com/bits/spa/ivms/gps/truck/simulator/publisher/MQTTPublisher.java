@@ -10,12 +10,20 @@ import javax.annotation.PreDestroy;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class MQTTPublisher {
+
+    private static final List<String> routeNames = Arrays.asList("Mumbai Expressway", "Agra Expressway", "Golden Quadrilateral");
+
+    private static final List<Integer> driverIds = Arrays.asList(100, 101, 102, 103, 104);
+
+    private Random random = new Random();
 
     private final GPSTruckSimulation gpsTruckSimulation;
 
@@ -31,21 +39,14 @@ public class MQTTPublisher {
         connectClientToBroker();
 
         if (publisher.isConnected()) {
-            int randomId = (int) (Math.random() * 100);
-            String routeName = "Route " + randomId;
-            int driverId = (int) (Math.random() * 100);
-            MqttMessage mockTruckData = getTruckDataPayload(routeName, driverId, 1);
-            publishSingleTruckMessage(mockTruckData, topic);
-
-            for (int i = 0; i < 1; i++) {
-                routeName = "Route " + (++randomId);
-                ++driverId;
-                mockTruckData = getTruckDataPayload(routeName, driverId, i+2);
+            for (int i = 0; i < driverIds.size(); i++) {
+                String routeName = routeNames.get(random.nextInt(routeNames.size()));
+                int driverId = driverIds.get(i);
+                MqttMessage mockTruckData = getTruckDataPayload(routeName, driverId, i+1);
                 publishSingleTruckMessage(mockTruckData, topic);
                 TimeUnit.SECONDS.sleep(5);
             }
         }
-
     }
 
     private void publishSingleTruckMessage(MqttMessage message, String topic) throws MqttException {

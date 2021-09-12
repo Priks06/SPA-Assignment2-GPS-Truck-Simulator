@@ -32,7 +32,7 @@ public class GeoJSONHelper {
             JsonObject jsonObject = new JsonObject(data);
             BsonArray features = jsonObject.toBsonDocument().get("features").asArray();
             BsonValue value = features.get(0).asDocument().get("geometry").asDocument().get("coordinates").asArray().get(0).asArray().get(0);
-            logger.info("Trying some bson shit: {}", value);
+//            logger.info("Trying some bson shit: {}", value);
 
             features.get(0).asDocument().get("geometry").asDocument().get("coordinates").asArray().forEach(bsonValue -> {
                 double longitude = bsonValue.asArray().get(0).asDouble().doubleValue();
