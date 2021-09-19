@@ -110,7 +110,7 @@ public class KafkaTruckSpeedingConsumer {
 
     private void publishTruckSpeed(TruckData truckData, double speedInKMPH) {
         TruckSpeed truckSpeed = new TruckSpeed(truckData.getDriverId(), truckData.getRouteName(), truckData.getCurrTimestamp(), speedInKMPH);
-        ProducerRecord<String, TruckSpeed> record = new ProducerRecord<>(kafkaSpeedTopic, truckSpeed);
+        ProducerRecord<String, TruckSpeed> record = new ProducerRecord<>(kafkaSpeedTopic, String.valueOf(truckData.getDriverId()), truckSpeed);
         logger.info("Kafka speed producer record: {}", record.value());
         kafkaProducer.send(record, (recordMetadata, e) -> {
             if (e == null) {

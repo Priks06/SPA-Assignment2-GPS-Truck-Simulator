@@ -49,7 +49,7 @@ public class MQTTSubscriber {
             truckDataList.forEach(truckData -> {
                 logger.info("Data received: {}", truckData);
 
-                ProducerRecord<String, TruckData> record = new ProducerRecord<>(kafkaTopic, truckData);
+                ProducerRecord<String, TruckData> record = new ProducerRecord<>(kafkaTopic, String.valueOf(truckData.getDriverId()), truckData);
                 logger.info("Kafka producer record: {}", record.value());
                 kafkaProducer.send(record, (recordMetadata, e) -> {
                     if (e == null) {

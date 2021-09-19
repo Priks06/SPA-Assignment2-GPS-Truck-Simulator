@@ -44,7 +44,7 @@ public class KafkaTruckOverSpeedingConsumer {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KStream<String, TruckSpeed> speedStream = streamsBuilder.stream(kafkaSpeedTopic);
         speedStream
-                .filter((key, truckSpeed) -> truckSpeed.getSpeed() > 21.0)
+                .filter((key, truckSpeed) -> truckSpeed.getSpeed() > 50.0)
                 .to(kafkaOverSpeedTopic);
 
         kafkaStreams = new KafkaStreams(streamsBuilder.build(), properties);

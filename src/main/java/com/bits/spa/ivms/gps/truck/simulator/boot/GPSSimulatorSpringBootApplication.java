@@ -51,7 +51,7 @@ public class GPSSimulatorSpringBootApplication implements CommandLineRunner {
     public void run(String... args) {
 
         String brokerAddr = "tcp://test.mosquitto.org:1883";
-        String topic = "spa/assignment2/truck";
+        String topic = "spa/assignment2/geo_location";
 
         try {
             kafkaTruckOverSpeedingConsumer.filterAndPublishOverSpeedingTrucks();
